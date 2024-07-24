@@ -1,19 +1,14 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped
 from .database import Base
 
 team_membership = Table(
-    "teams_memberships",
+    "team_membership",
     Base.metadata,
     Column("user_id", Integer, ForeignKey("users.user_id")),
     Column("team_id", Integer, ForeignKey("teams.team_id")),
+    Column("memebership_id", Integer, primary_key=True),
 )
-
-class team_memebership(Base):
-    __tablename__ = "teams_memberships"
-    user_id = Column(Integer, ForeignKey("users.user_id"), primary_key=True)
-    team_id = Column(Integer, ForeignKey("teams.team_id"), primary_key=True)
-    membership_id = Column(Integer, primary_key=True)
 
 class User(Base):
     __tablename__ = "users"
@@ -33,3 +28,13 @@ class Team(Base):
     users = relationship("User", secondary=team_membership, back_populates="teams")
 
 
+class Integration(Base): 
+    __tablename__ = "integrations"
+    integration_id = Column(Integer, primary_key=True)
+    name = Column(String, index=True)
+    token = Column(String)
+    user_id = Column(Integer, ForeignKey("users.user_id"))
+    status = Column(String)
+
+    users = relationship("User")
+    
