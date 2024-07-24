@@ -76,7 +76,11 @@ def get_integrations_by_name(db: Session, name: str):
     return db.query(models.Integration).filter(models.Integration.name == name).first()
 
 def create_integration(db: Session, integration: schemas.Integration):
-    db_integration = models.Integration(integration.model_dump())
+    db_integration = models.Integration(**integration.model_dump())
+    db_integration.name = integration.name
+    db_integration.token = integration.token
+    db_integration.user_id = integration.user
+    db_integration.status = integration.status
     db.add(db_integration)
     db.commit()
     db.refresh(db_integration)
@@ -84,7 +88,10 @@ def create_integration(db: Session, integration: schemas.Integration):
 
 def update_integration(db: Session, integration: schemas.Integration):
     db_integration = db.query(models.Integration).filter(models.Integration.integration_id == integration.id).first()
-    db_integration = models.Integration(integration.model_dump())
+    db_integration.name = integration.name
+    db_integration.token = integration.token
+    db_integration.user_id = integration.user
+    db_integration.status = integration.status
     db.commit()
     db.refresh(db_integration)
     return db_integration

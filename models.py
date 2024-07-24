@@ -1,5 +1,5 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from .database import Base
 
 team_membership = Table(
@@ -33,8 +33,8 @@ class Integration(Base):
     integration_id = Column(Integer, primary_key=True)
     name = Column(String, index=True)
     token = Column(String)
-    user_id = Column(Integer, ForeignKey("users.user_id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
     status = Column(String)
 
-    users = relationship("User")
+    user: Mapped[User]= relationship("User")
     

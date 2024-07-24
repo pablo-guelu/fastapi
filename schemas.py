@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List, Optional
 
 class User(BaseModel):
     user_id: int
@@ -6,6 +7,7 @@ class User(BaseModel):
     last_name: str
     email: str
     status: str
+    integration_id: int | None
 
 class Team(BaseModel):
     team_id: int
@@ -15,5 +17,5 @@ class Integration(BaseModel):
     integration_id: int
     name: str
     token: str
-    user_id: int
+    user: Optional[List[int]] = None
     status: str

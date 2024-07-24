@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, status, Depends
 from sqlalchemy.orm import Session
+import uvicorn
 
 from . import models, schemas, crud
 from .database import SessionLocal, engine
@@ -128,3 +129,6 @@ async def delete_integration(integration_id: int, db: Session = Depends(get_db))
     if db_integration is None:
         raise HTTPException(status_code=404, detail="Integration not found")
     return crud.delete_integration(db=db, integration_id=integration_id)
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
