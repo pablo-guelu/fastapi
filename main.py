@@ -1,11 +1,24 @@
 from fastapi import FastAPI, HTTPException, status, Depends
 from sqlalchemy.orm import Session
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 from . import models, schemas, crud
 from .database import SessionLocal, engine
 
 app = FastAPI()
+
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -19,7 +32,7 @@ def get_db():
 
 ######### Users #########
 
-@app.get("/users/", response_model=list[schemas.User] | schemas.User)
+@app.get("/users", response_model=list[schemas.User] | schemas.User)
 async def read_users(skip: int = 0, limit: int = 100, user_id: int = None, email: str = None, db: Session = Depends(get_db)):
     if user_id is not None:
         db_user = crud.get_user(db, user_id=user_id)
@@ -35,7 +48,7 @@ async def read_users(skip: int = 0, limit: int = 100, user_id: int = None, email
         users = crud.get_users(db, skip=skip, limit=limit)
         return users
 
-@app.post("/users/", status_code=status.HTTP_201_CREATED)
+@app.post("/users", status_code=status.HTTP_201_CREATED)
 async def create_user(user: schemas.User, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
@@ -58,7 +71,7 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)):
 
 ######### Teams #########
 
-@app.get("/teams/", response_model=list[schemas.Team] | schemas.Team)
+@app.get("/teams", response_model=list[schemas.Team] | schemas.Team)
 async def read_teams(skip: int = 0, limit: int = 100, team_id: int = None, name: str = None, db: Session = Depends(get_db)):
     if team_id is not None:
         db_team = crud.get_team(db, team_id=team_id)
@@ -74,7 +87,7 @@ async def read_teams(skip: int = 0, limit: int = 100, team_id: int = None, name:
         teams = crud.get_teams(db, skip=skip, limit=limit)
         return teams
     
-@app.post("/teams/", status_code=status.HTTP_201_CREATED)
+@app.post("/teams", status_code=status.HTTP_201_CREATED)
 async def create_team(team: schemas.Team, db: Session = Depends(get_db)):
     db_team = crud.get_team_by_name(db, name=team.name)
     if db_team:
@@ -98,7 +111,7 @@ async def delete_team(team_id: int, db: Session = Depends(get_db)):
 
 ######### Integrations #########
 
-@app.get("/integrations/", response_model=list[schemas.Integration] | schemas.Integration)
+@app.get("/integrations", response_model=list[schemas.Integration] | schemas.Integration)
 async def read_integrations(skip: int = 0, limit: int = 100, name: str = None, db: Session = Depends(get_db)):
     if name is not None:
         db_integration = crud.get_integrations_by_name(db, name=name)
@@ -109,7 +122,7 @@ async def read_integrations(skip: int = 0, limit: int = 100, name: str = None, d
         integrations = crud.get_integrations(db, skip=skip, limit=limit)
         return integrations
     
-@app.post("/integrations/", status_code=status.HTTP_201_CREATED)
+@app.post("/integrations", status_code=status.HTTP_201_CREATED)
 async def create_integration(integration: schemas.Integration, db: Session = Depends(get_db)):
     db_integration = crud.get_integrations_by_name(db, name=integration.name)
     if db_integration:
